@@ -84,7 +84,7 @@ namespace ExtensionMethodsDemo
         }
     }
 
-    public static class EnumerableExtensions
+    public static class EnumerableExtensionTests
     {
         public static List<List<T>> GroupBy<T>(this IEnumerable<T> items, Func<List<List<T>>, T, List<List<T>>> grouping)
         {
