@@ -1,9 +1,10 @@
-﻿using System.Linq.Expressions;
+﻿using AutoFixture;
+using AutoFixture.Kernel;
 using System.Reflection;
 
 namespace AutoFixtureDemo
 {
-    public class AutoFixtureExtensions
+    public static class AutoFixtureExtensions
     {
         /// <summary>
         /// Omit all properties on a type apart from those specified in the constructor. If checkDeclaringType = false, then
@@ -13,24 +14,6 @@ namespace AutoFixtureDemo
         {
             private readonly List<string> names = new List<string>();
             private readonly bool checkDeclaringType = true;
-
-            internal PropertyNameIncluder(Expression<Func<T, object[]>> ex) =>
-                names = new List<string>(ex.GetMemberNamesFromCollection());
-
-            internal PropertyNameIncluder(bool checkDeclaringType, Expression<Func<T, object[]>> ex)
-            {
-                names = new List<string>(ex.GetMemberNamesFromCollection());
-                this.checkDeclaringType = checkDeclaringType;
-            }
-
-            internal PropertyNameIncluder(Expression<Func<T, object>> ex) =>
-                this.names.Add(ex.GetMemberName());
-
-            internal PropertyNameIncluder(bool checkDeclaringType, Expression<Func<T, object>> ex)
-            {
-                this.names.Add(ex.GetMemberName());
-                this.checkDeclaringType = checkDeclaringType;
-            }
 
             internal PropertyNameIncluder(params string[] names) =>
                 this.names = names.ToList();
@@ -62,24 +45,6 @@ namespace AutoFixtureDemo
             private readonly List<string> names = new List<string>();
             private readonly bool checkDeclaringType = true;
 
-            internal PropertyNameOmitter(Expression<Func<T, object[]>> ex) =>
-                this.names = new List<string>(ex.GetMemberNamesFromCollection());
-
-            internal PropertyNameOmitter(bool checkDeclaringType, Expression<Func<T, object[]>> ex)
-            {
-                this.names = new List<string>(ex.GetMemberNamesFromCollection());
-                this.checkDeclaringType = checkDeclaringType;
-            }
-
-            internal PropertyNameOmitter(Expression<Func<T, object>> ex) =>
-                this.names.Add(ex.GetMemberName());
-
-            internal PropertyNameOmitter(bool checkDeclaringType, Expression<Func<T, object>> ex)
-            {
-                this.names.Add(ex.GetMemberName());
-                this.checkDeclaringType = checkDeclaringType;
-            }
-
             internal PropertyNameOmitter(params string[] names) =>
                 this.names = names.ToList();
 
@@ -99,6 +64,21 @@ namespace AutoFixtureDemo
 
                 return new NoSpecimen();
             }
+        }
+
+        public static void GenStringAsType<TConv>(this IFixture fixture, params string[] property)
+        {
+            fixture.Customizations.Add(new GenerateStringAsType<string, TConv>(fixture, property));
+        }
+
+        public static void GenPropertyAsType<TProp, TConv>(this IFixture fixture, params string[] property)
+        {
+            fixture.Customizations.Add(new GenerateStringAsType<TProp, TConv>(fixture, property));
+        }
+
+        public static void GenPropertyAsType<TProp, TConv>(this IFixture fixture, bool check, params string[] property)
+        {
+            fixture.Customizations.Add(new GenerateStringAsType<TProp, TConv>(check, fixture, property));
         }
 
         /// <summary>
