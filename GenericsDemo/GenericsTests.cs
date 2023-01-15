@@ -14,7 +14,10 @@ namespace GenericsDemo
         [SetUp]
         public void Setup()
         {
-            GenericProperty = new Generic<DemoObject>();
+            GenericProperty = new Generic<DemoObject>
+            {
+                GenericProperty = new DemoObject()
+            };
         }
 
         [Test]

@@ -38,7 +38,7 @@ namespace ExtensionMethodsDemo
         }
     }
 
-    public static class ExpressionExtensionTests
+    public static class ExpressionExtensions
     {
         public static T GetMemberInfo<T>(this Expression expression)
             where T : MemberInfo

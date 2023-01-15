@@ -94,83 +94,50 @@ namespace DelegatesDemo
         [Test]
         public void Expressions()
         {
-            Expression<Func<int[]>> newArrayExample = () => new[]
+            // unlike funcs, expressions have the benefit of
+            // accessing the lambda to use properties such as name
+            var name = expression2.Name;
+            var body = expression2.Body;
+
+            Expression<Func<bool>> binaryExample = () => 1 > 0;
+
+            // expressions have multiple types depending on the body of the expression tree,
+            // these are some that I have encountered
+            if (binaryExample.Body is BinaryExpression)
             {
-                1,2,3
-            };
+                Assert.That(binaryExample.Body, Is.AssignableTo<BinaryExpression>());
+            }
+
+            Expression<Func<bool>> conditionalExmaple = () => 1 == 0 ? true : false;
+
+            if (conditionalExmaple.Body is ConditionalExpression)
+            {
+                Assert.That(conditionalExmaple.Body, Is.AssignableTo<ConditionalExpression>());
+            }
 
             Expression<Func<List<int>>> newListExample = () => new List<int>
             {
                 1,2,3
             };
 
-            var i = 0;
-            Expression<Func<bool>> binaryExample = () => i > 0;
-            Expression<Func<bool>> conditionalExmaple = () => i == 0 ? true : false;
-
-            // expressions have the benefit of accessing the lambda to use properties
-            var name = expression2.Name;
-            var body = expression2.Body;
-
-            // manual expression building
-            var argument = Expression.Parameter(typeof(DemoObject));
-            var left = Expression.Property(argument, "Id");
-            var right = Expression.Constant("Blah");
-
-            // binary expression
-            var predicate = Expression.Lambda<Func<DemoObject, bool>>(
-                Expression.ReferenceEqual(left, right),
-                new[] { argument }
-            );
-
-            var rst = predicate.Compile().Invoke(new DemoObject
+            if (newListExample.Body is ListInitExpression)
             {
-                Id = "Blah"
-            });
-
-            Assert.That(predicate.Body, Is.AssignableTo<BinaryExpression>());
-
-            // once created, expressions have different body types depending
-            // on the return type
-            Assert.That(newArrayExample.Body, Is.AssignableTo<NewArrayExpression>());
-            Assert.That(newListExample.Body, Is.AssignableTo<ListInitExpression>());
-            Assert.That(binaryExample.Body, Is.AssignableTo<BinaryExpression>());
-            Assert.That(conditionalExmaple.Body, Is.AssignableTo<ConditionalExpression>());
-
-            // expressions have multiple types depending on the body of the expression tree,
-            // these are some that I have encountered
-            if (expression is BinaryExpression)
-            {
-
+                Assert.That(newListExample.Body, Is.AssignableTo<ListInitExpression>());
             }
-            else if (expression is ConditionalExpression)
-            {
 
-            }
-            else if (expression is ListInitExpression)
+            Expression<Func<int[]>> newArrayExample = () => new[]
             {
+                1,2,3
+            };
 
-            }
-            else if (expression is NewArrayExpression)
+            if (newArrayExample.Body is NewArrayExpression)
             {
-
+                Assert.That(newArrayExample.Body, Is.AssignableTo<NewArrayExpression>());
             }
 
             // expressions can be compiled and the resulting func can be invoked
             var arr = newArrayExample.Compile().Invoke();
-            expression2.Compile().Invoke();
-        }
-
-        [Test]
-        public async Task Tasks()
-        {
-            // tasks are a wrapper for calling methods async
-            var task = new Task(() => { });
-
-            // you can take an existing method and wrap it in a task to call it async
-            task = new Task(EmptyAction);
-
-            await task;
+            Assert.That(arr.Length, Is.EqualTo(3));
         }
 
         public void EmptyAction() { }
